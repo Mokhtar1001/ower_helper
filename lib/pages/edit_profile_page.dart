@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../services/database_service.dart';
+import '../theme/app_theme.dart';
 
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({super.key});
@@ -9,7 +11,6 @@ class EditProfilePage extends StatefulWidget {
 }
 
 class _EditProfilePageState extends State<EditProfilePage> {
-
   final _formKey = GlobalKey<FormState>();
   final _passwordFormKey = GlobalKey<FormState>();
 
@@ -44,7 +45,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
         if (mounted) {
           setState(() {
             userData = doc;
-            _usernameController.text = userData?['username'] ?? userData?['name'] ?? '';
+            _usernameController.text =
+                userData?['username'] ?? userData?['name'] ?? '';
             _phoneController.text = userData?['phone'] ?? '';
           });
         }
@@ -73,7 +75,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Profile updated successfully!'),
-            backgroundColor: Colors.green,
+            backgroundColor: AppColors.success,
           ),
         );
 
@@ -101,7 +103,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Password changed successfully! (Mocked)'),
-            backgroundColor: Colors.green,
+            backgroundColor: AppColors.success,
           ),
         );
 
@@ -123,7 +125,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: Colors.red,
+        backgroundColor: AppColors.error,
       ),
     );
   }
@@ -141,293 +143,268 @@ class _EditProfilePageState extends State<EditProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
-      appBar: AppBar(
-        title: const Text(
-          'Edit Profile',
-          style: TextStyle(
-            color: Color.fromARGB(255, 11, 53, 87),
-            fontWeight: FontWeight.bold,
+      body: Container(
+        decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
+        child: SafeArea(
+          child: Column(
+            children: [
+              // App Bar
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                child: Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back_ios_new_rounded,
+                          color: AppColors.textPrimary),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                    const Spacer(),
+                    Text(
+                      'Edit Profile',
+                      style: GoogleFonts.inter(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    const Spacer(),
+                    const SizedBox(width: 48),
+                  ],
+                ),
+              ),
+
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Profile Information Section
+                      Text(
+                        'Profile Information',
+                        style: GoogleFonts.inter(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+
+                      GlassCard(
+                        padding: const EdgeInsets.all(24),
+                        child: Form(
+                          key: _formKey,
+                          child: Column(
+                            children: [
+                              // Username Field
+                              buildThemedField(
+                                controller: _usernameController,
+                                label: 'Username',
+                                prefixIcon: Icons.person_outline_rounded,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Username is required';
+                                  }
+                                  if (value.length < 3) {
+                                    return 'Username must be at least 3 characters';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              const SizedBox(height: 16),
+
+                              // Phone Field
+                              buildThemedField(
+                                controller: _phoneController,
+                                label: 'Phone Number',
+                                prefixIcon: Icons.phone_outlined,
+                                keyboardType: TextInputType.phone,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Phone number is required';
+                                  }
+                                  if (value.length < 10) {
+                                    return 'Enter a valid phone number';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              const SizedBox(height: 16),
+
+                              // Email Field (Read-only)
+                              TextFormField(
+                                initialValue:
+                                    userData?['email'] ?? 'user@example.com',
+                                enabled: false,
+                                style: GoogleFonts.inter(
+                                    color: AppColors.textMuted, fontSize: 15),
+                                decoration: InputDecoration(
+                                  labelText: 'Email (Cannot be changed)',
+                                  prefixIcon: const Icon(Icons.email_outlined),
+                                  fillColor: AppColors.surfaceLight,
+                                ),
+                              ),
+                              const SizedBox(height: 24),
+
+                              // Update Profile Button
+                              GradientButton(
+                                text: 'Save Changes',
+                                icon: Icons.save_rounded,
+                                isLoading: _isLoading,
+                                onPressed:
+                                    _isLoading ? null : _updateProfile,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 32),
+
+                      // Change Password Section
+                      Container(
+                        height: 1,
+                        color: AppColors.surfaceBorder,
+                      ),
+                      const SizedBox(height: 24),
+
+                      Text(
+                        'Change Password',
+                        style: GoogleFonts.inter(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+
+                      GlassCard(
+                        padding: const EdgeInsets.all(24),
+                        child: Form(
+                          key: _passwordFormKey,
+                          child: Column(
+                            children: [
+                              // Current Password
+                              buildThemedField(
+                                controller: _currentPasswordController,
+                                label: 'Current Password',
+                                prefixIcon: Icons.lock_outline_rounded,
+                                obscureText: _obscureCurrentPassword,
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    _obscureCurrentPassword
+                                        ? Icons.visibility_outlined
+                                        : Icons.visibility_off_outlined,
+                                    color: AppColors.textSecondary,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _obscureCurrentPassword =
+                                          !_obscureCurrentPassword;
+                                    });
+                                  },
+                                ),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Current password is required';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              const SizedBox(height: 16),
+
+                              // New Password
+                              buildThemedField(
+                                controller: _newPasswordController,
+                                label: 'New Password',
+                                prefixIcon: Icons.lock_rounded,
+                                obscureText: _obscureNewPassword,
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    _obscureNewPassword
+                                        ? Icons.visibility_outlined
+                                        : Icons.visibility_off_outlined,
+                                    color: AppColors.textSecondary,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _obscureNewPassword =
+                                          !_obscureNewPassword;
+                                    });
+                                  },
+                                ),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'New password is required';
+                                  }
+                                  if (value.length < 6) {
+                                    return 'Password must be at least 6 characters';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              const SizedBox(height: 16),
+
+                              // Confirm New Password
+                              buildThemedField(
+                                controller: _confirmPasswordController,
+                                label: 'Confirm New Password',
+                                prefixIcon: Icons.lock_clock_rounded,
+                                obscureText: _obscureConfirmPassword,
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    _obscureConfirmPassword
+                                        ? Icons.visibility_outlined
+                                        : Icons.visibility_off_outlined,
+                                    color: AppColors.textSecondary,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _obscureConfirmPassword =
+                                          !_obscureConfirmPassword;
+                                    });
+                                  },
+                                ),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Please confirm your password';
+                                  }
+                                  if (value !=
+                                      _newPasswordController.text) {
+                                    return 'Passwords do not match';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              const SizedBox(height: 24),
+
+                              // Change Password Button
+                              GradientButton(
+                                text: 'Change Password',
+                                icon: Icons.key_rounded,
+                                isLoading: _isLoading,
+                                gradient: const LinearGradient(
+                                  colors: [
+                                    AppColors.warning,
+                                    Color(0xFFE8940A),
+                                  ],
+                                ),
+                                onPressed:
+                                    _isLoading ? null : _changePassword,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 40),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
-        ),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Color.fromARGB(255, 11, 53, 87)),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Profile Information Section
-            const Text(
-              'Profile Information',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Color.fromARGB(255, 11, 53, 87),
-              ),
-            ),
-            const SizedBox(height: 20),
-
-            Form(
-              key: _formKey,
-              child: Column(
-                children: [
-                  // Username Field
-                  TextFormField(
-                    controller: _usernameController,
-                    decoration: InputDecoration(
-                      labelText: 'Username',
-                      prefixIcon: const Icon(Icons.person),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      filled: true,
-                      fillColor: Colors.white,
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Username is required';
-                      }
-                      if (value.length < 3) {
-                        return 'Username must be at least 3 characters';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Phone Field
-                  TextFormField(
-                    controller: _phoneController,
-                    keyboardType: TextInputType.phone,
-                    decoration: InputDecoration(
-                      labelText: 'Phone Number',
-                      prefixIcon: const Icon(Icons.phone),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      filled: true,
-                      fillColor: Colors.white,
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Phone number is required';
-                      }
-                      if (value.length < 10) {
-                        return 'Enter a valid phone number';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Email Field (Read-only)
-                  TextFormField(
-                    initialValue: userData?['email'] ?? 'user@example.com',
-                    enabled: false,
-                    decoration: InputDecoration(
-                      labelText: 'Email (Cannot be changed)',
-                      prefixIcon: const Icon(Icons.email),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      filled: true,
-                      fillColor: Colors.grey[200],
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Update Profile Button
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      onPressed: _isLoading ? null : _updateProfile,
-                      icon: const Icon(Icons.save),
-                      label: _isLoading
-                          ? const SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                                strokeWidth: 2,
-                              ),
-                            )
-                          : const Text('Save Changes'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color.fromARGB(255, 11, 53, 87),
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 40),
-
-            // Change Password Section
-            const Divider(),
-            const SizedBox(height: 20),
-            const Text(
-              'Change Password',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Color.fromARGB(255, 11, 53, 87),
-              ),
-            ),
-            const SizedBox(height: 20),
-
-            Form(
-              key: _passwordFormKey,
-              child: Column(
-                children: [
-                  // Current Password
-                  TextFormField(
-                    controller: _currentPasswordController,
-                    obscureText: _obscureCurrentPassword,
-                    decoration: InputDecoration(
-                      labelText: 'Current Password',
-                      prefixIcon: const Icon(Icons.lock_outline),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _obscureCurrentPassword
-                              ? Icons.visibility
-                              : Icons.visibility_off,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            _obscureCurrentPassword = !_obscureCurrentPassword;
-                          });
-                        },
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      filled: true,
-                      fillColor: Colors.white,
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Current password is required';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-
-                  // New Password
-                  TextFormField(
-                    controller: _newPasswordController,
-                    obscureText: _obscureNewPassword,
-                    decoration: InputDecoration(
-                      labelText: 'New Password',
-                      prefixIcon: const Icon(Icons.lock),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _obscureNewPassword
-                              ? Icons.visibility
-                              : Icons.visibility_off,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            _obscureNewPassword = !_obscureNewPassword;
-                          });
-                        },
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      filled: true,
-                      fillColor: Colors.white,
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'New password is required';
-                      }
-                      if (value.length < 6) {
-                        return 'Password must be at least 6 characters';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Confirm New Password
-                  TextFormField(
-                    controller: _confirmPasswordController,
-                    obscureText: _obscureConfirmPassword,
-                    decoration: InputDecoration(
-                      labelText: 'Confirm New Password',
-                      prefixIcon: const Icon(Icons.lock_clock),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _obscureConfirmPassword
-                              ? Icons.visibility
-                              : Icons.visibility_off,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            _obscureConfirmPassword = !_obscureConfirmPassword;
-                          });
-                        },
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      filled: true,
-                      fillColor: Colors.white,
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please confirm your password';
-                      }
-                      if (value != _newPasswordController.text) {
-                        return 'Passwords do not match';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Change Password Button
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      onPressed: _isLoading ? null : _changePassword,
-                      icon: const Icon(Icons.key),
-                      label: _isLoading
-                          ? const SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                                strokeWidth: 2,
-                              ),
-                            )
-                          : const Text('Change Password'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.orange,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 40),
-          ],
         ),
       ),
     );

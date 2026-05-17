@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../theme/app_theme.dart';
 
 class ClientRequestPage extends StatefulWidget {
   const ClientRequestPage({super.key});
@@ -8,7 +10,7 @@ class ClientRequestPage extends StatefulWidget {
 }
 
 class _ClientRequestPageState extends State<ClientRequestPage> {
-  List<Map<String, dynamic>> requests = [
+  List<Map<String, dynamic>> allRequests = [
     {
       'id': 1,
       'clientName': 'Ahmed Mohamed',
@@ -35,128 +37,225 @@ class _ClientRequestPageState extends State<ClientRequestPage> {
     },
   ];
 
+  late List<Map<String, dynamic>> requests;
+
+  @override
+  void initState() {
+    super.initState();
+    requests = List.from(allRequests);
+  }
+
+  void _filterRequests(String value) {
+    setState(() {
+      requests = allRequests
+          .where((r) => r['serviceType']
+              .toLowerCase()
+              .contains(value.toLowerCase()))
+          .toList();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: _buildAppBar(),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.all(20),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Text(
+              'My Requests',
+              style: GoogleFonts.inter(
+                fontSize: 24,
+                fontWeight: FontWeight.w800,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 16),
             _buildSearchBar(),
             const SizedBox(height: 16),
             Expanded(
-              child: ListView.builder(
-                itemCount: requests.length,
-                itemBuilder: (context, index) {
-                  final req = requests[index];
-                  return _buildRequestCard(req);
-                },
-              ),
+              child: requests.isEmpty
+                  ? Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.inbox_rounded,
+                              size: 48, color: AppColors.textMuted),
+                          const SizedBox(height: 12),
+                          Text(
+                            'No requests found',
+                            style: GoogleFonts.inter(
+                              color: AppColors.textSecondary,
+                              fontSize: 15,
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  : ListView.builder(
+                      itemCount: requests.length,
+                      itemBuilder: (context, index) {
+                        final req = requests[index];
+                        return _buildRequestCard(req);
+                      },
+                    ),
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  AppBar _buildAppBar() {
-    return AppBar(
-      backgroundColor: Colors.white,
-      elevation: 0,
-      iconTheme: const IconThemeData(color: Color.fromARGB(255, 11, 53, 87)),
-      centerTitle: true,
-      title: const Text(
-        'Client Requests',
-        style: TextStyle(
-            color: Color.fromARGB(255, 11, 53, 87),
-            fontWeight: FontWeight.bold),
       ),
     );
   }
 
   Widget _buildSearchBar() {
-    return TextField(
-      decoration: InputDecoration(
-        hintText: 'Search requests...',
-        prefixIcon: const Icon(Icons.search,
-            color: Color.fromARGB(255, 11, 53, 87)),
-        filled: true,
-        fillColor: Colors.white,
-        border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: BorderSide.none),
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.surfaceBorder),
       ),
-      onChanged: (value) {
-        setState(() {
-          // Simple filter example
-          requests = requests
-              .where((r) => r['serviceType']
-                  .toLowerCase()
-                  .contains(value.toLowerCase()))
-              .toList();
-        });
-      },
+      child: TextField(
+        style: GoogleFonts.inter(color: AppColors.textPrimary, fontSize: 15),
+        decoration: InputDecoration(
+          hintText: 'Search requests...',
+          hintStyle: GoogleFonts.inter(color: AppColors.textMuted, fontSize: 15),
+          prefixIcon:
+              const Icon(Icons.search_rounded, color: AppColors.textMuted),
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(vertical: 14),
+        ),
+        onChanged: _filterRequests,
+      ),
     );
   }
 
   Widget _buildRequestCard(Map<String, dynamic> req) {
     Color statusColor = _getStatusColor(req['status']);
-    return Card(
-      elevation: 3,
-      margin: const EdgeInsets.only(bottom: 16),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 14),
+      child: GlassCard(
+        padding: const EdgeInsets.all(18),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(req['serviceType'],
-                style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Color.fromARGB(255, 11, 53, 87))),
-            const SizedBox(height: 4),
-            Text(req['description']),
-            const SizedBox(height: 8),
             Row(
               children: [
-                Text('Budget: ${req['budget']}'),
-                const SizedBox(width: 16),
-                Text('Timeline: ${req['timeline']}'),
-                const Spacer(),
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                      color: statusColor.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: statusColor)),
+                    gradient: AppColors.primaryGradient,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(
+                    _getServiceIcon(req['serviceType']),
+                    color: Colors.white,
+                    size: 18,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    req['serviceType'],
+                    style: GoogleFonts.inter(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 10, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: statusColor.withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(20),
+                    border:
+                        Border.all(color: statusColor.withOpacity(0.4)),
+                  ),
                   child: Text(
                     req['status'],
-                    style: TextStyle(
-                        color: statusColor,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 12),
+                    style: GoogleFonts.inter(
+                      color: statusColor,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 12,
+                    ),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 10),
+            Text(
+              req['description'],
+              style: GoogleFonts.inter(
+                fontSize: 13,
+                color: AppColors.textSecondary,
+                height: 1.4,
+              ),
+            ),
+            const SizedBox(height: 12),
             Row(
               children: [
-                IconButton(
-                  onPressed: () => _showRequestDetails(req),
-                  icon: const Icon(Icons.visibility, size: 20),
+                _buildInfoChip(
+                    Icons.attach_money_rounded, req['budget'], AppColors.secondary),
+                const SizedBox(width: 10),
+                _buildInfoChip(
+                    Icons.schedule_rounded, req['timeline'], AppColors.primary),
+                const Spacer(),
+                GestureDetector(
+                  onTap: () => _showRequestDetails(req),
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: AppColors.surface,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: AppColors.surfaceBorder),
+                    ),
+                    child: const Icon(Icons.visibility_rounded,
+                        size: 18, color: AppColors.textSecondary),
+                  ),
                 ),
-                IconButton(
-                  onPressed: () => _contactClient(req),
-                  icon: const Icon(Icons.email, size: 20, color: Colors.blue),
+                const SizedBox(width: 8),
+                GestureDetector(
+                  onTap: () => _contactClient(req),
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(Icons.email_rounded,
+                        size: 18, color: AppColors.primary),
+                  ),
                 ),
               ],
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildInfoChip(IconData icon, String text, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: color),
+          const SizedBox(width: 4),
+          Text(
+            text,
+            style: GoogleFonts.inter(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: color,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -164,95 +263,88 @@ class _ClientRequestPageState extends State<ClientRequestPage> {
   Color _getStatusColor(String status) {
     switch (status) {
       case 'Pending':
-        return Colors.orange;
+        return AppColors.warning;
       case 'In Progress':
-        return Colors.blue;
+        return AppColors.info;
       case 'Completed':
-        return Colors.green;
+        return AppColors.success;
       default:
-        return Colors.grey;
+        return AppColors.textMuted;
     }
+  }
+
+  IconData _getServiceIcon(String type) {
+    final lower = type.toLowerCase();
+    if (lower.contains('backend')) return Icons.storage_rounded;
+    if (lower.contains('frontend')) return Icons.web_rounded;
+    if (lower.contains('design')) return Icons.palette_rounded;
+    return Icons.code_rounded;
   }
 
   void _showRequestDetails(Map<String, dynamic> req) {
     showDialog(
-        context: context,
-        builder: (_) {
-          return AlertDialog(
-            title: Text(req['serviceType']),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Client: ${req['clientName']}'),
-                Text('Budget: ${req['budget']}'),
-                Text('Timeline: ${req['timeline']}'),
-                Text('Status: ${req['status']}'),
-                const SizedBox(height: 10),
-                Text('Description:', style: const TextStyle(fontWeight: FontWeight.bold)),
-                Text(req['description']),
-              ],
-            ),
-            actions: [
-              TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('Close'))
+      context: context,
+      builder: (_) {
+        return AlertDialog(
+          title: Text(req['serviceType']),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _detailRow('Client', req['clientName']),
+              _detailRow('Budget', req['budget']),
+              _detailRow('Timeline', req['timeline']),
+              _detailRow('Status', req['status']),
+              const SizedBox(height: 12),
+              Text(
+                'Description:',
+                style: GoogleFonts.inter(
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textPrimary),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                req['description'],
+                style: GoogleFonts.inter(color: AppColors.textSecondary),
+              ),
             ],
-          );
-        });
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _detailRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Row(
+        children: [
+          Text(
+            '$label: ',
+            style: GoogleFonts.inter(
+                fontWeight: FontWeight.w600, color: AppColors.textSecondary),
+          ),
+          Text(
+            value,
+            style: GoogleFonts.inter(color: AppColors.textPrimary),
+          ),
+        ],
+      ),
+    );
   }
 
   void _contactClient(Map<String, dynamic> req) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Contacting ${req['clientName']} via email'),
+        backgroundColor: AppColors.primary,
       ),
     );
-  }
-
-  void _showAddRequestDialog() {
-    final nameController = TextEditingController();
-    final serviceController = TextEditingController();
-    final descController = TextEditingController();
-    final budgetController = TextEditingController();
-    final timelineController = TextEditingController();
-
-    showDialog(
-        context: context,
-        builder: (_) {
-          return AlertDialog(
-            title: const Text('Add New Request'),
-            content: SingleChildScrollView(
-              child: Column(
-                children: [
-                  TextField(controller: nameController, decoration: const InputDecoration(labelText: 'Client Name')),
-                  TextField(controller: serviceController, decoration: const InputDecoration(labelText: 'Service Type')),
-                  TextField(controller: descController, decoration: const InputDecoration(labelText: 'Description')),
-                  TextField(controller: budgetController, decoration: const InputDecoration(labelText: 'Budget')),
-                  TextField(controller: timelineController, decoration: const InputDecoration(labelText: 'Timeline')),
-                ],
-              ),
-            ),
-            actions: [
-              TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
-              ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      requests.add({
-                        'id': requests.length + 1,
-                        'clientName': nameController.text,
-                        'serviceType': serviceController.text,
-                        'description': descController.text,
-                        'budget': budgetController.text,
-                        'timeline': timelineController.text,
-                        'status': 'Pending',
-                      });
-                    });
-                    Navigator.pop(context);
-                  },
-                  child: const Text('Add')),
-            ],
-          );
-        });
   }
 }

@@ -52,8 +52,7 @@ class _RequestPageState extends State<RequestPage> {
       email: "omar@example.com",
       phone: "01244455667",
       serviceType: "UI / UX Design",
-      description:
-          "Full UI/UX design for ecommerce platform with 25 screens.",
+      description: "Full UI/UX design for ecommerce platform with 25 screens.",
       status: "Completed",
     ),
   ];
@@ -103,8 +102,9 @@ class _RequestPageState extends State<RequestPage> {
           final request = demoRequests[index];
           return Card(
             margin: const EdgeInsets.only(bottom: 16),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
             elevation: 3,
             child: Padding(
               padding: const EdgeInsets.all(16),
@@ -118,17 +118,22 @@ class _RequestPageState extends State<RequestPage> {
                       Text(
                         request.fullName,
                         style: const TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       const Spacer(),
                       GestureDetector(
                         onTap: () => changeStatus(request),
                         child: Container(
                           padding: const EdgeInsets.symmetric(
-                              vertical: 4, horizontal: 8),
+                            vertical: 4,
+                            horizontal: 8,
+                          ),
                           decoration: BoxDecoration(
-                            color:
-                                getStatusColor(request.status).withOpacity(0.2),
+                            color: getStatusColor(
+                              request.status,
+                            ).withOpacity(0.2),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(

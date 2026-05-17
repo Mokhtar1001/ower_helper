@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../models/service.dart';
+import '../theme/app_theme.dart';
 
 class EditServicePage extends StatefulWidget {
   final Service serviceToEdit;
@@ -30,7 +32,8 @@ class _EditServicePageState extends State<EditServicePage> {
   void initState() {
     super.initState();
     titleController = TextEditingController(text: widget.serviceToEdit.title);
-    descController = TextEditingController(text: widget.serviceToEdit.description);
+    descController =
+        TextEditingController(text: widget.serviceToEdit.description);
     priceController = TextEditingController(
         text: widget.serviceToEdit.price?.toString() ?? '');
     durationController =
@@ -84,132 +87,183 @@ class _EditServicePageState extends State<EditServicePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
-      appBar: AppBar(
-        title: const Text('Edit Service'),
-        backgroundColor: Colors.blue,
-        elevation: 0,
-        centerTitle: true,
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                // Title
-                TextFormField(
-                  controller: titleController,
-                  decoration: const InputDecoration(
-                    labelText: 'Service Title',
-                    prefixIcon: Icon(Icons.title),
-                    border: OutlineInputBorder(),
-                    filled: true,
-                    fillColor: Colors.white70,
-                  ),
-                  validator: (v) =>
-                      v == null || v.isEmpty ? 'Enter a title' : null,
-                ),
-                const SizedBox(height: 12),
-
-                // Description
-                TextFormField(
-                  controller: descController,
-                  decoration: const InputDecoration(
-                    labelText: 'Service Description',
-                    prefixIcon: Icon(Icons.description),
-                    border: OutlineInputBorder(),
-                    filled: true,
-                    fillColor: Colors.white70,
-                  ),
-                  maxLines: 3,
-                ),
-                const SizedBox(height: 12),
-
-                // Price
-                TextFormField(
-                  controller: priceController,
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    labelText: 'Price',
-                    prefixIcon: Icon(Icons.attach_money),
-                    border: OutlineInputBorder(),
-                    filled: true,
-                    fillColor: Colors.white70,
-                  ),
-                ),
-                const SizedBox(height: 12),
-
-                // Duration
-                TextFormField(
-                  controller: durationController,
-                  decoration: const InputDecoration(
-                    labelText: 'Delivery Time',
-                    prefixIcon: Icon(Icons.access_time),
-                    border: OutlineInputBorder(),
-                    filled: true,
-                    fillColor: Colors.white70,
-                  ),
-                ),
-                const SizedBox(height: 12),
-
-                // Features
-                Row(
+      body: Container(
+        decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
+        child: SafeArea(
+          child: Column(
+            children: [
+              // App Bar
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                child: Row(
                   children: [
-                    Expanded(
-                      child: TextFormField(
-                        controller: featureController,
-                        decoration: const InputDecoration(
-                          labelText: 'Add Feature',
-                          prefixIcon: Icon(Icons.add_box),
-                          border: OutlineInputBorder(),
-                          filled: true,
-                          fillColor: Colors.white70,
-                        ),
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back_ios_new_rounded,
+                          color: AppColors.textPrimary),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                    const Spacer(),
+                    Text(
+                      'Edit Service',
+                      style: GoogleFonts.inter(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textPrimary,
                       ),
                     ),
-                    IconButton(
-                      icon: const Icon(Icons.add, color: Colors.blue),
-                      onPressed: addFeature,
-                    ),
+                    const Spacer(),
+                    const SizedBox(width: 48),
                   ],
                 ),
-                const SizedBox(height: 10),
+              ),
 
-                // Show Features
-                if (features.isNotEmpty)
-                  Column(
-                    children: features
-                        .asMap()
-                        .entries
-                        .map(
-                          (entry) => ListTile(
-                            leading: const Icon(Icons.check_circle, color: Colors.green),
-                            title: Text(entry.value),
-                            trailing: IconButton(
-                              icon: const Icon(Icons.delete, color: Colors.red),
-                              onPressed: () => removeFeature(entry.key),
-                            ),
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(24),
+                  child: GlassCard(
+                    padding: const EdgeInsets.all(24),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        children: [
+                          // Title
+                          buildThemedField(
+                            controller: titleController,
+                            label: 'Service Title',
+                            prefixIcon: Icons.title_rounded,
+                            validator: (v) => v == null || v.isEmpty
+                                ? 'Enter a title'
+                                : null,
                           ),
-                        )
-                        .toList(),
-                  ),
-                const SizedBox(height: 20),
+                          const SizedBox(height: 16),
 
-                ElevatedButton(
-                  onPressed: saveChanges,
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: const Size(double.infinity, 50),
-                    backgroundColor: Colors.blue,
-                  ),
-                  child: const Text(
-                    'Save Changes',
-                    style: TextStyle(fontSize: 18),
+                          // Description
+                          buildThemedField(
+                            controller: descController,
+                            label: 'Service Description',
+                            prefixIcon: Icons.description_outlined,
+                            maxLines: 3,
+                          ),
+                          const SizedBox(height: 16),
+
+                          // Price
+                          buildThemedField(
+                            controller: priceController,
+                            label: 'Price',
+                            prefixIcon: Icons.attach_money_rounded,
+                            keyboardType: TextInputType.number,
+                          ),
+                          const SizedBox(height: 16),
+
+                          // Duration
+                          buildThemedField(
+                            controller: durationController,
+                            label: 'Delivery Time',
+                            prefixIcon: Icons.schedule_rounded,
+                          ),
+                          const SizedBox(height: 16),
+
+                          // Features
+                          Row(
+                            children: [
+                              Expanded(
+                                child: buildThemedField(
+                                  controller: featureController,
+                                  label: 'Add Feature',
+                                  prefixIcon: Icons.add_box_outlined,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              GestureDetector(
+                                onTap: addFeature,
+                                child: Container(
+                                  padding: const EdgeInsets.all(14),
+                                  decoration: BoxDecoration(
+                                    gradient: AppColors.primaryGradient,
+                                    borderRadius: BorderRadius.circular(14),
+                                  ),
+                                  child: const Icon(Icons.add_rounded,
+                                      color: Colors.white, size: 22),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+
+                          // Show Features
+                          if (features.isNotEmpty)
+                            Column(
+                              children: features
+                                  .asMap()
+                                  .entries
+                                  .map(
+                                    (entry) => Padding(
+                                      padding:
+                                          const EdgeInsets.only(bottom: 8),
+                                      child: Container(
+                                        padding:
+                                            const EdgeInsets.symmetric(
+                                                horizontal: 12,
+                                                vertical: 10),
+                                        decoration: BoxDecoration(
+                                          color: AppColors.success
+                                              .withOpacity(0.08),
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          border: Border.all(
+                                            color: AppColors.success
+                                                .withOpacity(0.2),
+                                          ),
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            const Icon(
+                                                Icons
+                                                    .check_circle_rounded,
+                                                color: AppColors.success,
+                                                size: 18),
+                                            const SizedBox(width: 10),
+                                            Expanded(
+                                              child: Text(
+                                                entry.value,
+                                                style: GoogleFonts.inter(
+                                                  color: AppColors
+                                                      .textPrimary,
+                                                  fontSize: 14,
+                                                ),
+                                              ),
+                                            ),
+                                            GestureDetector(
+                                              onTap: () =>
+                                                  removeFeature(
+                                                      entry.key),
+                                              child: const Icon(
+                                                  Icons
+                                                      .delete_outline_rounded,
+                                                  color: AppColors.error,
+                                                  size: 18),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                  .toList(),
+                            ),
+                          const SizedBox(height: 24),
+
+                          GradientButton(
+                            text: 'Save Changes',
+                            icon: Icons.save_rounded,
+                            onPressed: saveChanges,
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

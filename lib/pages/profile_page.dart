@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../services/auth_service.dart';
 import '../services/database_service.dart';
+import '../theme/app_theme.dart';
 import 'package:ower_project/pages/profile_provider_page.dart';
 import 'login_page.dart';
 
@@ -13,7 +15,6 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-
   bool isLoading = true;
   String? userRole;
 
@@ -53,12 +54,10 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      return Scaffold(
-        appBar: AppBar(
-          title: const Text('Profile'),
-          backgroundColor: const Color.fromARGB(255, 11, 53, 87),
+      return const SafeArea(
+        child: Center(
+          child: CircularProgressIndicator(color: AppColors.primary),
         ),
-        body: const Center(child: CircularProgressIndicator()),
       );
     }
 
@@ -80,7 +79,6 @@ class ClientProfilePage extends StatefulWidget {
 }
 
 class _ClientProfilePageState extends State<ClientProfilePage> {
-
   Map<String, dynamic>? userData;
   bool isLoading = true;
 
@@ -120,261 +118,181 @@ class _ClientProfilePageState extends State<ClientProfilePage> {
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
+      return const SafeArea(
+        child: Center(
+          child: CircularProgressIndicator(color: AppColors.primary),
+        ),
       );
     }
 
-    final String displayName = userData?['username'] ?? userData?['name'] ?? 'User';
+    final String displayName =
+        userData?['username'] ?? userData?['name'] ?? 'User';
     final String email = userData?['email'] ?? 'No email';
     final String phone = userData?['phone'] ?? 'No phone';
-    final String initial = displayName.isNotEmpty ? displayName[0].toUpperCase() : 'U';
+    final String initial =
+        displayName.isNotEmpty ? displayName[0].toUpperCase() : 'U';
 
-    return Scaffold(
-      backgroundColor: Colors.grey[50],
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        centerTitle: true,
-        iconTheme: const IconThemeData(color: Color.fromARGB(255, 11, 53, 87)),
-        title: const Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.person, color: Color.fromARGB(255, 11, 53, 87), size: 26),
-            SizedBox(width: 8),
-            Text(
-              "Profile",
-              style: TextStyle(
-                color: Color.fromARGB(255, 11, 53, 87),
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.edit),
-            tooltip: 'Edit Profile',
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Edit Profile - Coming Soon')),
-              );
-            },
-          ),
-        ],
-      ),
-
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(vertical: 20),
+    return SafeArea(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Profile Header
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
+            Text(
+              'Profile',
+              style: GoogleFonts.inter(
+                fontSize: 24,
+                fontWeight: FontWeight.w800,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            // Profile Header with Gradient Avatar
+            Center(
+              child: Column(
                 children: [
-                  CircleAvatar(
-                    radius: 40,
-                    backgroundColor: Colors.blue.shade300,
-                    child: Text(
-                      initial,
-                      style: const TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                  Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: AppColors.accentGradient,
+                    ),
+                    child: CircleAvatar(
+                      radius: 48,
+                      backgroundColor: AppColors.surface,
+                      child: Text(
+                        initial,
+                        style: GoogleFonts.inter(
+                          fontSize: 36,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.primary,
+                        ),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 20),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          displayName,
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.blue.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: const Text(
-                            'Client',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.blue,
-                            ),
-                          ),
-                        ),
-                      ],
+                  const SizedBox(height: 14),
+                  Text(
+                    displayName,
+                    style: GoogleFonts.inter(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimary,
                     ),
-                  )
+                  ),
+                  const SizedBox(height: 6),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 14, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      'Client',
+                      style: GoogleFonts.inter(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
-
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
 
             // Contact Info Card
-            Card(
-              margin: const EdgeInsets.symmetric(horizontal: 16),
-              elevation: 2,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
+            GlassCard(
+              padding: const EdgeInsets.all(4),
               child: Column(
                 children: [
-                  ListTile(
-                    leading: const Icon(
-                      Icons.email,
-                      color: Color.fromARGB(255, 11, 53, 87),
-                    ),
-                    title: const Text("Email"),
-                    subtitle: Text(email),
+                  _buildInfoTile(Icons.email_rounded, 'Email', email),
+                  Divider(
+                    color: AppColors.surfaceBorder.withOpacity(0.5),
+                    height: 1,
+                    indent: 16,
+                    endIndent: 16,
                   ),
-                  const Divider(height: 1),
-                  ListTile(
-                    leading: const Icon(
-                      Icons.phone,
-                      color: Color.fromARGB(255, 11, 53, 87),
-                    ),
-                    title: const Text("Phone"),
-                    subtitle: Text(phone),
-                  ),
+                  _buildInfoTile(Icons.phone_rounded, 'Phone', phone),
                 ],
               ),
             ),
-
-            const SizedBox(height: 25),
+            const SizedBox(height: 28),
 
             // Account Settings
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              child: Text(
-                "Account Settings",
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
+            Text(
+              'Account Settings',
+              style: GoogleFonts.inter(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textPrimary,
               ),
             ),
+            const SizedBox(height: 12),
 
-            const SizedBox(height: 10),
-
-            _optionItem(
-              icon: Icons.shopping_bag,
-              title: "My Requests",
-              onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('My Requests - Coming Soon')),
-                );
-              },
+            _buildOptionItem(
+              icon: Icons.shopping_bag_rounded,
+              title: 'My Requests',
+              color: AppColors.primary,
+              onTap: () => _showComingSoon('My Requests'),
             ),
-            _optionItem(
-              icon: Icons.notifications,
-              title: "Notifications",
-              onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Notifications - Coming Soon')),
-                );
-              },
+            _buildOptionItem(
+              icon: Icons.notifications_rounded,
+              title: 'Notifications',
+              color: AppColors.warning,
+              onTap: () => _showComingSoon('Notifications'),
             ),
-            _optionItem(
-              icon: Icons.settings,
-              title: "Settings",
-              onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Settings - Coming Soon')),
-                );
-              },
+            _buildOptionItem(
+              icon: Icons.settings_rounded,
+              title: 'Settings',
+              color: AppColors.secondary,
+              onTap: () => _showComingSoon('Settings'),
             ),
-            _optionItem(
-              icon: Icons.help_outline,
-              title: "Help & Support",
-              onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Help - Coming Soon')),
-                );
-              },
+            _buildOptionItem(
+              icon: Icons.help_outline_rounded,
+              title: 'Help & Support',
+              color: AppColors.info,
+              onTap: () => _showComingSoon('Help'),
             ),
-            _optionItem(
+            _buildOptionItem(
               icon: Icons.privacy_tip_outlined,
-              title: "Terms & Privacy",
-              onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Terms - Coming Soon')),
-                );
-              },
+              title: 'Terms & Privacy',
+              color: AppColors.textMuted,
+              onTap: () => _showComingSoon('Terms'),
             ),
 
-            const SizedBox(height: 30),
+            const SizedBox(height: 28),
 
             // Logout Button
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: ElevatedButton.icon(
-                icon: const Icon(Icons.logout),
-                label: const Text("Logout"),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  minimumSize: const Size(double.infinity, 48),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
+            GestureDetector(
+              onTap: () => _confirmLogout(),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                decoration: BoxDecoration(
+                  color: AppColors.error.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: AppColors.error.withOpacity(0.3)),
                 ),
-                onPressed: () async {
-                  final confirm = await showDialog<bool>(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                      title: const Text('Logout'),
-                      content: const Text('Are you sure you want to logout?'),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(context, false),
-                          child: const Text('Cancel'),
-                        ),
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red,
-                            foregroundColor: Colors.white,
-                          ),
-                          onPressed: () => Navigator.pop(context, true),
-                          child: const Text('Logout'),
-                        ),
-                      ],
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.logout_rounded,
+                        color: AppColors.error, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Logout',
+                      style: GoogleFonts.inter(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.error,
+                      ),
                     ),
-                  );
-
-                  if (confirm == true && mounted) {
-                    await AuthService().signOut();
-                    if (mounted) {
-                      Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const LoginFormLayout(),
-                        ),
-                        (route) => false,
-                      );
-                    }
-                  }
-                },
+                  ],
+                ),
               ),
             ),
-
             const SizedBox(height: 30),
           ],
         ),
@@ -382,16 +300,130 @@ class _ClientProfilePageState extends State<ClientProfilePage> {
     );
   }
 
-  Widget _optionItem({
+  Widget _buildInfoTile(IconData icon, String title, String value) {
+    return ListTile(
+      leading: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: AppColors.primary.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Icon(icon, color: AppColors.primary, size: 20),
+      ),
+      title: Text(
+        title,
+        style: GoogleFonts.inter(
+          color: AppColors.textMuted,
+          fontSize: 12,
+        ),
+      ),
+      subtitle: Text(
+        value,
+        style: GoogleFonts.inter(
+          color: AppColors.textPrimary,
+          fontSize: 15,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildOptionItem({
     required IconData icon,
     required String title,
+    required Color color,
     required VoidCallback onTap,
   }) {
-    return ListTile(
-      leading: Icon(icon, color: const Color.fromARGB(255, 11, 53, 87)),
-      title: Text(title),
-      trailing: const Icon(Icons.chevron_right),
-      onTap: onTap,
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(14),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            decoration: BoxDecoration(
+              color: AppColors.surface.withOpacity(0.5),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: AppColors.surfaceBorder.withOpacity(0.5)),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: color.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(icon, color: color, size: 20),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Text(
+                    title,
+                    style: GoogleFonts.inter(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                ),
+                const Icon(Icons.chevron_right_rounded,
+                    color: AppColors.textMuted, size: 20),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
+  }
+
+  void _showComingSoon(String feature) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('$feature — Coming Soon'),
+        backgroundColor: AppColors.primary,
+      ),
+    );
+  }
+
+  void _confirmLogout() async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Logout'),
+        content: const Text(
+          'Are you sure you want to logout?',
+          style: TextStyle(color: AppColors.textSecondary),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          GradientButton(
+            text: 'Logout',
+            width: 100,
+            height: 42,
+            gradient: const LinearGradient(
+              colors: [AppColors.error, Color(0xFFCC3344)],
+            ),
+            onPressed: () => Navigator.pop(context, true),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true && mounted) {
+      await AuthService().signOut();
+      if (mounted) {
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (_) => const LoginFormLayout()),
+          (route) => false,
+        );
+      }
+    }
   }
 }
